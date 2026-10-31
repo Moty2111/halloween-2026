@@ -124,7 +124,7 @@
     var btnShare = HW.$('#cd-share');
     var btnLink = HW.$('#cd-link');
 
-    function applyCard(next) {
+    function applyCard(next, skipFit) {
       card = {
         to: clean(next.to, LIMITS.to),
         from: clean(next.from, LIMITS.from),
@@ -155,7 +155,7 @@
 
       if (elFrom) elFrom.textContent = card.from || DEFAULT_CARD.from;
 
-      if (opened) fitLetter(true);
+      if (opened && !skipFit) fitLetter(true);
     }
 
     function fillForm() {
@@ -248,6 +248,9 @@
       if (!editor) return;
       editor.hidden = true;
       document.body.classList.remove('is-editing');
+      /* несохранённые правки откатываем: иначе письмо оставалось бы
+         с текстом из закрытого редактора */
+      if (savedCard) applyCard(savedCard, true);
       var e = env;
       if (e && e.focus) e.focus({ preventScroll: true });
     }
@@ -283,6 +286,7 @@
           wish: inWish ? inWish.value : ''
         });
         HW.storage.set(CARD_KEY, card);
+        savedCard = { to: card.to, from: card.from, wish: card.wish };
         cardTouched = true;
         closeEditor();
         flashNote('Сохранено. Письмо переписано.', true);
@@ -293,12 +297,27 @@
       btnReset.addEventListener('click', function () {
         applyCard(DEFAULT_CARD);
         HW.storage.del(CARD_KEY);
+        savedCard = { to: card.to, from: card.from, wish: card.wish };
         cardTouched = false;
         if (location.hash) history.replaceState(null, '', location.pathname);
         fillForm();
         flashNote('Вернули исходный текст.', true);
       });
     }
+
+    /* живой предпросмотр: пока набираешь, письмо уже переписано —
+       иначе понять, что получится, было нельзя */
+    function preview() {
+      if (!editor || editor.hidden) return;
+      applyCard({
+        to: inTo ? inTo.value : '',
+        from: inFrom ? inFrom.value : '',
+        wish: inWish ? inWish.value : ''
+      }, true);
+    }
+    [inTo, inFrom, inWish].forEach(function (n) {
+      if (n) n.addEventListener('input', preview);
+    });
 
     if (btnShare) btnShare.addEventListener('click', copyShare);
     if (inWish) inWish.addEventListener('input', updateCount);
@@ -316,6 +335,8 @@
     }
 
     applyCard(card);
+    /* что записано в открытке: предпросмотр в редакторе можно отменить */
+    var savedCard = { to: card.to, from: card.from, wish: card.wish };
 
     /* ── кладбище за конвертом ── */
     var YARD = {
@@ -363,13 +384,23 @@
     function bareTree(target, x, baseY, h, seed) {
       if (!target) return;
       var i;
+      var trunk = 'M' + x + ' ' + baseY + ' Q' + (x + h * 0.07) + ' ' + (baseY - h * 0.5) +
+                  ' ' + (x - h * 0.04) + ' ' + (baseY - h);
       target.appendChild(el('path', {
-        d: 'M' + x + ' ' + baseY + ' Q' + (x + h * 0.07) + ' ' + (baseY - h * 0.5) +
-           ' ' + (x - h * 0.04) + ' ' + (baseY - h),
+        d: trunk,
         fill: 'none',
         stroke: '#06050d',
         'stroke-width': Math.max(1.8, h * 0.028).toFixed(1),
         'stroke-linecap': 'round'
+      }));
+      /* лунная кромка: без неё ствол полностью сливался с небом */
+      target.appendChild(el('path', {
+        d: trunk,
+        fill: 'none',
+        stroke: 'rgba(168, 156, 208, 0.3)',
+        'stroke-width': Math.max(0.9, h * 0.008).toFixed(1),
+        'stroke-linecap': 'round',
+        transform: 'translate(1.6,0)'
       }));
 
       var frag = document.createDocumentFragment();
@@ -446,8 +477,12 @@
       var tr = HW.$('#yard-tree');
       if (tr) {
         tr.textContent = '';
-        bareTree(tr, YARD.w * 0.115, YARD.hNear, 238, 3);
-        bareTree(tr, YARD.w * 0.885, YARD.hNear, 208, 5);
+        /* деревья крупнее и их больше: раньше два тонких силуэта по краям
+           читались как случайные палки на фоне */
+        bareTree(tr, YARD.w * 0.075, YARD.hNear, 306, 3);
+        bareTree(tr, YARD.w * 0.905, YARD.hNear, 268, 5);
+        bareTree(tr, YARD.w * 0.245, YARD.hNear, 184, 7);
+        bareTree(tr, YARD.w * 0.742, YARD.hNear, 202, 11);
       }
 
       var gr = HW.$('#yard-graves');
@@ -556,10 +591,12 @@
 
       var s = Math.min(1, avail / curH);
       /* на портретном телефоне не мельчим письмо до марки: лучше пусть
-         страница прокрутится, чем текст шириной в 200 px. В альбоме пол
-         ниже — там высота кадра и так мала */
+         страница прокрутится, чем текст шириной в 200 px. Пол зависит от
+         узости экрана: телефонам (≈2.16:1) нужен высокий пол, планшетам
+         (≈1.33:1) — ниже, иначе крупное письмо наезжает на кнопки.
+         В альбоме пол низкий — там высота кадра и так мала */
       var portrait = vh > global.innerWidth;
-      var floor = portrait ? 0.72 : 0.34;
+      var floor = portrait ? Math.min(0.72, Math.max(0.34, (vh / global.innerWidth) * 0.4)) : 0.34;
       if (s < floor) s = floor;
 
       var visH = s * curH;

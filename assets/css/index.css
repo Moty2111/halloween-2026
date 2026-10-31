@@ -379,6 +379,84 @@ html { overflow: hidden; }
   gap: clamp(0.7rem, 2vw, 1.1rem);
 }
 
+/* ═══ полупрозрачные кнопки на главной ═══
+   За воротами туман и лес — кнопки должны пропускать сцену сквозь себя,
+   а не закрывать её глухими плашками. Стекло + blur, медь тоже стеклянная. */
+.hero__actions .btn {
+  -webkit-backdrop-filter: blur(11px) saturate(1.2);
+  backdrop-filter: blur(11px) saturate(1.2);
+}
+
+.hero__actions .btn--primary {
+  /* слои прозрачности складываются: суммарная альфа ≈ 0.5, а не 1.
+     Поэтому каждый слой здесь совсем слабый — иначе кнопка снова глухая. */
+  --btn-frame: rgba(255, 216, 168, 0.42);
+  --btn-orn: rgba(255, 244, 218, 0.95);
+  background-color: rgba(242, 118, 15, 0.22);
+  background-image:
+    repeating-linear-gradient(112deg, rgba(255, 255, 255, 0.04) 0 1px, transparent 1px 6px),
+    radial-gradient(130% 180% at 50% -30%, rgba(255, 240, 210, 0.2) 0%, rgba(255, 217, 160, 0) 58%),
+    linear-gradient(155deg,
+      rgba(255, 201, 135, 0.18) 0%,
+      rgba(255, 154, 51, 0.15) 38%,
+      rgba(242, 118, 15, 0.13) 68%,
+      rgba(201, 78, 5, 0.12) 100%);
+  box-shadow:
+    0 0 0 1px rgba(120, 58, 12, 0.5),
+    inset 0 1px 0 rgba(255, 248, 232, 0.5),
+    inset 0 -3px 0 rgba(112, 40, 0, 0.14),
+    0 10px 34px -14px rgba(255, 138, 30, 0.45);
+  /* на просвечивающей меди тёмно-коричневая подпись давала контраст 2.4:1 —
+     переводим на кремовый с тёмной тенью (6.6:1 на подсветке, 16:1 на тени) */
+  color: #fff6e4;
+  text-shadow: 0 1px 2px rgba(56, 18, 0, 0.6), 0 0 10px rgba(90, 36, 4, 0.35);
+}
+
+.hero__actions .btn--ghost {
+  /* не «чёрная плашка на чёрном», а подсвеченное морозное стекло:
+     чуть светлее ночи, чтобы сквозь него читался туман */
+  background-color: rgba(58, 50, 96, 0.22);
+  background-image:
+    repeating-linear-gradient(135deg, rgba(255, 255, 255, 0.025) 0 1px, transparent 1px 7px),
+    radial-gradient(120% 170% at 50% 125%, rgba(132, 100, 255, 0.16), transparent 62%),
+    linear-gradient(180deg, rgba(118, 104, 178, 0.12), rgba(18, 14, 34, 0.14));
+  box-shadow:
+    0 0 0 1px rgba(150, 130, 220, 0.24),
+    inset 0 1px 0 rgba(235, 228, 255, 0.18),
+    inset 0 -2px 0 rgba(0, 0, 0, 0.2),
+    0 8px 26px -16px rgba(0, 0, 0, 0.6);
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.55);
+}
+
+/* у базовых :hover другая специфичность — без этих правил стекло
+   не отзывалось бы на курсор */
+.hero__actions .btn--primary:hover {
+  background-color: rgba(242, 118, 15, 0.3);
+  box-shadow:
+    0 0 0 1px rgba(120, 58, 12, 0.62),
+    inset 0 1px 0 rgba(255, 250, 238, 0.7),
+    inset 0 -3px 0 rgba(112, 40, 0, 0.18),
+    0 0 34px rgba(255, 138, 30, 0.42),
+    0 18px 44px -12px rgba(255, 138, 30, 0.5);
+}
+
+.hero__actions .btn--ghost:hover {
+  background-color: rgba(82, 70, 132, 0.3);
+  box-shadow:
+    0 0 0 1px rgba(178, 156, 255, 0.4),
+    inset 0 1px 0 rgba(240, 234, 255, 0.26),
+    inset 0 -2px 0 rgba(0, 0, 0, 0.22),
+    0 0 30px rgba(132, 100, 255, 0.24);
+}
+
+.hero__actions .btn--primary:active {
+  background-color: rgba(242, 118, 15, 0.42);
+}
+
+.hero__actions .btn--ghost:active {
+  background-color: rgba(122, 96, 190, 0.3);
+}
+
 .hero__hint {
   margin-top: clamp(1.6rem, 4vh, 2.6rem);
   font-size: var(--fs-small);

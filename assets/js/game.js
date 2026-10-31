@@ -18,13 +18,65 @@
   var BK_RIM = 36;
   var BK_DROP = 94;
   var BY = GROUND_Y - BK_DROP * BK_SCALE - 6;
+  var CA_Y = LH - 56;
+  var WORLD_K = 1;
   var BHW = 50;
   var SLOW_DUR = 0.45;
   var SLOW_MIN = 0.4;
-  var KEY_SPEED = 720;
+  var KEY_BASE = 720;
+  var KEY_SPEED = KEY_BASE;
   var BEST_KEY = 'hw.candycatch.best';
   var ENDLESS_KEY = 'hw.candycatch.endless';
   var MODE_KEY = 'hw.candycatch.mode';
+
+  /* Мир игры. На десктопе — 960×600, на телефоне — вытянутый 620×940:
+     с фиксированными 960×600 портретный кадр получался 371×232, и играть
+     было нечем. Высота и ширина мира меняются вместе, поэтому круги
+     остаются кругами: draw() масштабирует x и y независимо, но отношения
+     совпадают с кадром. */
+  var PORTRAIT_W = 620;
+  var PORTRAIT_H = 940;
+  var isPortraitWorld = false;
+
+  var FOG_MIN = 320;
+  var FOG_MAX = 548;
+
+  function wantPortraitWorld() {
+    var vw = global.innerWidth || 0;
+    var vh = global.innerHeight || 0;
+    return vw > 0 && vw <= 700 && vh > vw * 1.05;
+  }
+
+  /* Пересобирает производные от размера мира константы.
+     Возвращает true, если мир действительно сменился. */
+  function applyWorld() {
+    var p = wantPortraitWorld();
+    if (p === isPortraitWorld) return false;
+    isPortraitWorld = p;
+
+    if (p) {
+      LW = PORTRAIT_W;
+      LH = PORTRAIT_H;
+      GROUND_Y = LH - 14;
+    } else {
+      LW = 960;
+      LH = 600;
+      GROUND_Y = 586;
+    }
+
+    BY = GROUND_Y - BK_DROP * BK_SCALE - 6;
+    CA_Y = LH - 56;
+    FOG_MIN = GROUND_Y - 266;
+    FOG_MAX = GROUND_Y - 38;
+
+    /* горизонтальные скорости — в долях ширины мира: в узком мире те же
+       пиксели в секунду означали бы вдвое более быструю игру на экране */
+    var k = LW / 960;
+    KEY_SPEED = KEY_BASE * k;
+    WORLD_K = k;
+
+    return true;
+  }
 
   var REDUCED = !!HW.reduced;
   var LOW = !!HW.lowPower;
@@ -751,6 +803,213 @@
     return c;
   }
 
+  /* ── фон для портретного мира 620×940 ──
+     Отдельная композиция, а не растянутый на 960×600: при растяжении
+     луна уезжала бы в середину кадра, а сосны вырастали бы выше неба. */
+  function buildPortraitBackground() {
+    var c = makeCanvas(LW, LH);
+    var g = c.getContext('2d');
+    if (!g) return c;
+
+    var i;
+    var GY = GROUND_Y;
+    var MX = LW * 0.68;
+    var MY = LH * 0.145;
+    var MR = 52;
+
+    /* небо */
+    var sky = g.createLinearGradient(0, 0, 0, LH);
+    sky.addColorStop(0, '#150f2c');
+    sky.addColorStop(0.3, '#120d25');
+    sky.addColorStop(0.66, '#0b0818');
+    sky.addColorStop(1, '#050409');
+    g.fillStyle = sky;
+    g.fillRect(0, 0, LW, LH);
+
+    /* звёзды */
+    g.fillStyle = '#f3ecff';
+    for (i = 0; i < 150; i++) {
+      var sx = ((i * 733) % 619) + 1;
+      var sy = (((i * 7919) % 611) / 611) * GY * 0.62;
+      var sr = 0.35 + ((i * 31) % 9) * 0.1;
+      g.globalAlpha = 0.25 + ((i * 17) % 7) * 0.1;
+      g.beginPath();
+      g.arc(sx, sy, sr, 0, TAU);
+      g.fill();
+      if (i % 23 === 0) {
+        g.globalAlpha = 0.5;
+        g.fillRect(sx - 2.6, sy - 0.4, 5.2, 0.8);
+        g.fillRect(sx - 0.4, sy - 2.6, 0.8, 5.2);
+      }
+    }
+    g.globalAlpha = 1;
+
+    /* луна: большая, с ореолами и кратерами */
+    g.globalCompositeOperation = 'lighter';
+    halo(g, MX, MY, 250, '122,92,255', 0.1);
+    halo(g, MX, MY, 120, '214,196,255', 0.14);
+    g.globalCompositeOperation = 'source-over';
+
+    var moonG = g.createRadialGradient(MX - MR * 0.35, MY - MR * 0.4, MR * 0.15, MX, MY, MR);
+    moonG.addColorStop(0, '#fbf6ea');
+    moonG.addColorStop(0.72, '#e9def6');
+    moonG.addColorStop(1, '#c9bce8');
+    g.fillStyle = moonG;
+    g.beginPath();
+    g.arc(MX, MY, MR, 0, TAU);
+    g.fill();
+
+    g.fillStyle = 'rgba(164,150,196,0.5)';
+    var craters = [
+      [MX - 14, MY - 12, 10], [MX + 22, MY + 16, 7.4],
+      [MX + 26, MY - 18, 5], [MX - 22, MY + 22, 6],
+      [MX + 40, MY + 4, 3.8]
+    ];
+    for (i = 0; i < craters.length; i++) {
+      g.beginPath();
+      g.arc(craters[i][0], craters[i][1], craters[i][2], 0, TAU);
+      g.fill();
+    }
+
+    /* облачные полосы */
+    for (i = 0; i < 4; i++) {
+      g.fillStyle = 'rgba(24,20,46,' + (0.5 - i * 0.07).toFixed(2) + ')';
+      g.beginPath();
+      g.ellipse(LW * 0.46 + i * LW * 0.12, LH * 0.245 + i * 21, 220 - i * 30, 12 - i * 1.4, 0, 0, TAU);
+      g.fill();
+    }
+
+    /* дальние сосны */
+    pineRow(g, GY - 208, 11, 128, 22, 'rgba(20,16,38,0.85)', 7);
+
+    /* туман у подножия */
+    var fog = g.createLinearGradient(0, GY - 250, 0, GY - 60);
+    fog.addColorStop(0, 'rgba(126,112,180,0)');
+    fog.addColorStop(0.5, 'rgba(126,112,180,0.13)');
+    fog.addColorStop(1, 'rgba(126,112,180,0)');
+    g.fillStyle = fog;
+    g.fillRect(0, GY - 250, LW, 190);
+
+    /* ближние сосны */
+    pineRow(g, GY - 116, 8, 190, 34, 'rgba(11,9,21,0.97)', 23);
+
+    /* холм */
+    g.fillStyle = '#090714';
+    g.beginPath();
+    g.moveTo(0, GY - 92);
+    g.quadraticCurveTo(LW * 0.22, GY - 142, LW * 0.46, GY - 104);
+    g.quadraticCurveTo(LW * 0.7, GY - 62, LW * 0.86, GY - 96);
+    g.quadraticCurveTo(LW * 0.95, GY - 112, LW, GY - 92);
+    g.lineTo(LW, LH);
+    g.lineTo(0, LH);
+    g.closePath();
+    g.fill();
+
+    /* голые деревья */
+    bareTree(g, LW * 0.13, GY - 70, 214, '#0a0814', 3);
+    bareTree(g, LW * 0.88, GY - 64, 186, '#0a0814', 9);
+
+    /* забор */
+    var posts = 17;
+    var step = LW / posts;
+    g.fillStyle = '#0a0817';
+    for (i = 0; i < posts; i++) {
+      var fx = 4 + i * step;
+      var fh = 44 + ((i * 37) % 24);
+      g.fillRect(fx, GY - 38 - fh, 9, fh);
+      g.fillStyle = 'rgba(118,106,166,0.22)';
+      g.fillRect(fx, GY - 38 - fh, 2.4, fh);
+      g.fillStyle = '#0a0817';
+    }
+    g.fillRect(0, GY - 106, LW, 6);
+    g.fillRect(0, GY - 78, LW, 5);
+
+    /* надгробья */
+    var graves = [
+      { x: LW * 0.14, w: 46, h: 80, r: 23 },
+      { x: LW * 0.52, w: 36, h: 54, r: 16 },
+      { x: LW * 0.84, w: 48, h: 72, r: 21 }
+    ];
+    for (i = 0; i < graves.length; i++) {
+      var gv = graves[i];
+      g.fillStyle = '#08060f';
+      g.beginPath();
+      g.moveTo(gv.x - gv.w / 2, GY - 30);
+      g.lineTo(gv.x - gv.w / 2, GY - 30 - gv.h + gv.r);
+      g.arc(gv.x, GY - 30 - gv.h + gv.r, gv.r, Math.PI, 0);
+      g.lineTo(gv.x + gv.w / 2, GY - 30);
+      g.closePath();
+      g.fill();
+      g.fillStyle = 'rgba(150,138,205,0.16)';
+      g.fillRect(gv.x - gv.w / 2, GY - 30 - gv.h + gv.r, 2, gv.h - gv.r);
+    }
+
+    /* крест */
+    g.fillStyle = '#08060f';
+    g.fillRect(LW * 0.45, GY - 132, 9, 100);
+    g.fillRect(LW * 0.45 - 24, GY - 114, 57, 9);
+
+    /* земля */
+    var grd = g.createLinearGradient(0, GY - 12, 0, LH);
+    grd.addColorStop(0, '#0b0812');
+    grd.addColorStop(0.35, '#060509');
+    grd.addColorStop(1, '#030206');
+    g.fillStyle = grd;
+    g.fillRect(0, GY - 12, LW, LH - GY + 12);
+
+    g.strokeStyle = 'rgba(150,138,205,0.18)';
+    g.lineWidth = 1.6;
+    g.beginPath();
+    g.moveTo(0, GY - 4);
+    g.lineTo(LW, GY - 4);
+    g.stroke();
+
+    /* камешки и трава */
+    g.fillStyle = 'rgba(126,116,168,0.22)';
+    for (i = 0; i < 90; i++) {
+      var px = ((i * 977) % 619) + 1;
+      var py = GY + ((i * 431) % 12);
+      g.fillRect(px, py, 1 + (i % 3), 1);
+    }
+
+    g.strokeStyle = 'rgba(24,20,40,0.9)';
+    for (i = 0; i < 80; i++) {
+      var gx = (i / 80) * LW + ((i * 37) % 11) - 5;
+      var gh = 14 + ((i * 53) % 26);
+      var lean = ((i * 29) % 13) - 6;
+      g.lineWidth = 1.2 + ((i * 17) % 9) * 0.28;
+      g.beginPath();
+      g.moveTo(gx, LH);
+      g.quadraticCurveTo(gx + lean * 0.5, LH - gh * 0.6, gx + lean, LH - gh);
+      g.stroke();
+    }
+
+    /* фонарь-тыква слева внизу */
+    g.fillStyle = '#030206';
+    g.beginPath();
+    g.ellipse(48, LH - 6, 50, 38, 0, 0, TAU);
+    g.fill();
+    g.fillRect(42, LH - 52, 11, 18);
+    g.globalCompositeOperation = 'lighter';
+    halo(g, 48, LH - 20, 130, '255,138,30', 0.2);
+    halo(g, MX, MY, 400, '122,92,255', 0.06);
+    g.globalCompositeOperation = 'source-over';
+
+    /* виньетка */
+    var vig = g.createRadialGradient(LW * 0.5, LH * 0.4, LH * 0.25, LW * 0.5, LH * 0.4, LH * 0.95);
+    vig.addColorStop(0, 'rgba(2,1,4,0)');
+    vig.addColorStop(0.7, 'rgba(2,1,4,0.4)');
+    vig.addColorStop(1, 'rgba(2,1,4,0.92)');
+    g.fillStyle = vig;
+    g.fillRect(0, 0, LW, LH);
+
+    return c;
+  }
+
+  function paintBackground() {
+    return isPortraitWorld ? buildPortraitBackground() : buildBackground();
+  }
+
   /* ── animated ambience: fog wisps, drifting leaves, distant bats ── */
   var amb = null;
 
@@ -763,7 +1022,7 @@
     for (i = 0; i < 6; i++) {
       wisps.push({
         x: rnd(-300, LW),
-        y: rnd(320, 548),
+        y: rnd(FOG_MIN, FOG_MAX),
         rx: rnd(230, 430),
         ry: rnd(26, 62),
         sp: rnd(4, 12),
@@ -812,7 +1071,7 @@
     for (i = 0; i < amb.wisps.length; i++) {
       p = amb.wisps[i];
       p.x += p.sp * dt;
-      if (p.x - p.rx > LW) { p.x = -p.rx; p.y = rnd(320, 548); }
+      if (p.x - p.rx > LW) { p.x = -p.rx; p.y = rnd(FOG_MIN, FOG_MAX); }
     }
 
     for (i = 0; i < amb.leaves.length; i++) {
@@ -1001,7 +1260,7 @@ var shownLevel = -1;
     function spawn() {
       var kind = pickType();
       var def = TYPES[kind];
-      var amp = rnd(16, 44);
+      var amp = rnd(16, 44) * (LW / 960);
       var bx = rnd(amp + 34, LW - amp - 34);
       objects.push({
         kind: kind,
@@ -1553,7 +1812,6 @@ var CA = {
       BASE_SPEED: 420,
       MAX_SPEED: 1060
     };
-    var CA_Y = LH - 56;
 
     var ca = null;
 
@@ -1591,7 +1849,7 @@ var CA = {
         vy: 0,
         r: CA.BALL_R,
         stuck: true,
-        speed: Math.min(CA.MAX_SPEED, CA.BASE_SPEED + (ca.wave - 1) * 62)
+        speed: Math.min(CA.MAX_SPEED * WORLD_K, (CA.BASE_SPEED + (ca.wave - 1) * 62) * WORLD_K)
       };
     }
 
@@ -2046,6 +2304,18 @@ ctx.save();
     }
 
     function fit() {
+      /* поворот телефона меняет мир; в середине раунда не трогаем,
+         иначе счёт и жизни сбросятся без предупреждения */
+      if ((state === 'idle' || state === 'over') && applyWorld()) {
+        bgSprite = paintBackground();
+        buildAmbience();
+        if (!REDUCED) {
+          trail = makeCanvas(LW, LH);
+          tctx = trail.getContext('2d');
+        }
+        resetRound();
+      }
+
       var box = stage.getBoundingClientRect();
       var availW = Math.max(140, box.width);
       var availH = Math.max(90, box.height);
@@ -2187,9 +2457,13 @@ ctx.save();
 
       if (!els.score || !els.time || !els.livesBox || !els.startBtn || !els.over) return false;
 
+      /* мир выбирается до отрисовки фона и спрайтов: на телефоне он
+         вытянутый, иначе кадр получался 371×232 */
+      applyWorld();
+
       glowWarm = sprGlow(255, 168, 60);
       glowPoison = sprGlow(140, 230, 150);
-      bgSprite = buildBackground();
+      bgSprite = paintBackground();
       buildAmbience();
 
       sprites = {

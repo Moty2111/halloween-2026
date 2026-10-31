@@ -29,7 +29,7 @@ html, body { overscroll-behavior: none; }
   position: relative;
   justify-self: center;
   align-self: center;
-  width: min(100%, calc((100svh - 8rem) * 1.6));
+  width: min(100%, calc((100svh - 6.5rem) * 1.6));
   aspect-ratio: 960 / 600;
   max-width: 100%;
   max-height: 100%;
@@ -46,6 +46,16 @@ html, body { overscroll-behavior: none; }
   -webkit-user-select: none;
   user-select: none;
   -webkit-tap-highlight-color: transparent;
+}
+
+/* На телефоне мир вытянутый: тот же кадр 960×600 давал всего 232 px
+   высоты, и играть было нечем. Пропорция должна совпадать с PORTRAIT_W/H
+   из game.js, иначе первый кадр до fit() будет неверного размера. */
+@media (orientation: portrait) and (max-width: 700px) {
+  .cc-frame {
+    width: min(100%, calc((100svh - 7rem) * 0.66));
+    aspect-ratio: 620 / 940;
+  }
 }
 
 .cc-canvas {
