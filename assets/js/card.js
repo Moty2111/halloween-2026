@@ -179,13 +179,12 @@
     }
 
     /* ── ссылка для отправки ── */
+    /* копируем чистую ссылку на открытку без параметров текста: письмо
+       хранится локально в браузере отправителя, а получатель открывает
+       свою собственную открытку к язык ссылки не пестрит огромной закодированной
+       строкой */
     function shareUrl() {
-      var p = new URLSearchParams();
-      if (card.to) p.set('k', b64encode(card.to));
-      if (card.from) p.set('f', b64encode(card.from));
-      if (card.wish) p.set('w', b64encode(card.wish));
-      var qs = p.toString();
-      return location.origin + location.pathname + (qs ? '#' + qs : '');
+      return location.origin + location.pathname;
     }
 
     function copyShare(btn) {
