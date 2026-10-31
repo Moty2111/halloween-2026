@@ -179,12 +179,16 @@
     }
 
     /* ── ссылка для отправки ── */
-    /* копируем чистую ссылку на открытку без параметров текста: письмо
-       хранится локально в браузере отправителя, а получатель открывает
-       свою собственную открытку к язык ссылки не пестрит огромной закодированной
-       строкой */
+    /* текст письма (кому/от кого/пожелание) кодируется в адресе после #:
+       получатель открывает ссылку и видит именно твою открытку, а не
+       дефолтную. Данные идут отдельно от основного адреса — в хэше. */
     function shareUrl() {
-      return location.origin + location.pathname;
+      var p = new URLSearchParams();
+      if (card.to) p.set('k', b64encode(card.to));
+      if (card.from) p.set('f', b64encode(card.from));
+      if (card.wish) p.set('w', b64encode(card.wish));
+      var qs = p.toString();
+      return location.origin + location.pathname + (qs ? '#' + qs : '');
     }
 
     function copyShare(btn) {
@@ -256,14 +260,12 @@
 
     if (btnEdit) btnEdit.addEventListener('click', openEditor);
 
-    /* «Ссылка на открытку»: пока письмо не переписано, сразу копировать нечего —
-       отправляем в редактор вписать кому, от кого и что. Дальше — сразу копирует.
-       Флаг нужен потому, что «от кого» заполнено и в исходном тексте. */
-    var cardTouched = !!location.hash || !!HW.storage.get(CARD_KEY);
+    /* «Ссылка на открытку»: всегда копирует ссылку с текущим текстом —
+       получатель увидит твоё письмо. Редактор открывается отдельной
+       кнопкой «Изменить текст» или с главной через ?edit=1. */
     if (btnLink) {
       btnLink.addEventListener('click', function () {
-        if (cardTouched) copyShare(btnLink);
-        else openEditor();
+        copyShare(btnLink);
       });
     }
 
@@ -286,7 +288,6 @@
         });
         HW.storage.set(CARD_KEY, card);
         savedCard = { to: card.to, from: card.from, wish: card.wish };
-        cardTouched = true;
         closeEditor();
         flashNote('Сохранено. Письмо переписано.', true);
       });
@@ -297,7 +298,6 @@
         applyCard(DEFAULT_CARD);
         HW.storage.del(CARD_KEY);
         savedCard = { to: card.to, from: card.from, wish: card.wish };
-        cardTouched = false;
         if (location.hash) history.replaceState(null, '', location.pathname);
         fillForm();
         flashNote('Вернули исходный текст.', true);
