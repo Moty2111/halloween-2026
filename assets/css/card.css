@@ -170,7 +170,7 @@ body.is-open .cd-hint { opacity: 0; transform: translateY(-8px); pointer-events:
 
 .env-wrap {
   position: relative;
-  width: min(600px, 94vw);
+  width: min(640px, 97vw);
   aspect-ratio: 430 / 290;
   perspective: 1800px;
 }
@@ -458,7 +458,7 @@ body.is-open .seal { pointer-events: none; }
   left: 50%;
   /* письмо должно быть заметно уже конверта, иначе в закрытом виде
      выглядывает по бокам; при закрытом rotateX сжимает только высоту */
-  width: min(520px, 93vw, 78vh);
+  width: min(560px, 96vw, 82vh);
   bottom: 5%;
   z-index: 1;
   transform: translateX(-50%) translateY(0) rotateX(56deg);
@@ -951,11 +951,47 @@ body.is-open::before {
   margin-top: clamp(1.1rem, 3vw, 1.5rem);
 }
 
+/* на мобильных лист прокручивается, а кнопки должны оставаться видимыми:
+   липкая панель внизу листа, с фоном, чтобы текст не просвечивал */
+@media (max-width: 899px) {
+  .editor__row {
+    position: sticky;
+    bottom: 0;
+    margin-top: clamp(0.9rem, 2.6vw, 1.2rem);
+    padding: 0.7rem 0 0.4rem;
+    background: linear-gradient(180deg, rgba(10, 8, 18, 0) 0%, rgba(10, 8, 18, 0.94) 38%, rgba(10, 8, 18, 0.97) 100%);
+    z-index: 2;
+  }
+}
+
 .editor__row .btn { flex: 1 1 auto; min-width: 140px; }
 
 /* ═══════════ АДАПТИВ ═══════════ */
+/* маленькие телефоны в портрете: лист редактора был выше контента,
+   и кнопки «Сохранить»/«Сбросить» оказывались за нижним краем без
+   очевидной прокрутки (на 320×568 контент 762px при листе 500px).
+   Уплотняем лист, чтобы всё помещалось без внутреннего скролла */
+@media (max-width: 420px) and (max-height: 740px) {
+  .editor__sheet {
+    padding-top: 0.7rem;
+    padding-bottom: calc(0.6rem + env(safe-area-inset-bottom));
+  }
+  .editor__title { font-size: 1.15rem; }
+  .editor__lead {
+    margin-top: 0.2rem;
+    font-size: 0.72rem;
+    line-height: 1.4;
+  }
+  .field { margin-top: 0.55rem; }
+  .field__input { min-height: 40px; padding: 0.5em 0.8em; }
+  .field__input--area { min-height: 74px; }
+  .editor__note { margin-top: 0.4rem; }
+  .editor__row { margin-top: 0.55rem; }
+  .editor__row .btn { min-height: 44px; padding: 0.6em 1em; font-size: 0.78rem; }
+}
+
 @media (max-width: 560px) {
-  .env-wrap { width: 92vw; }
+  .env-wrap { width: min(640px, 97vw); }
   .cd-main { padding-top: 4.6rem; }
   .editor__sheet { border-radius: var(--radius-lg) var(--radius-lg) 0 0; }
   .editor__row .btn { min-width: 100%; }
