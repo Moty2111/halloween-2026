@@ -1,0 +1,915 @@
+/* ===== card.css · Открытка ===== */
+
+.cd-body {
+  min-height: 100svh;
+  overflow-x: hidden;
+}
+
+.cd-body #fx-parts { z-index: 5; }
+
+/* ═══════════ КЛАДБИЩЕ ═══════════ */
+.yard {
+  position: fixed;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.yard__layer {
+  position: absolute;
+  left: 0;
+  right: 0;
+}
+
+.yard__layer--far {
+  bottom: 15%;
+  height: 30%;
+  opacity: 0.6;
+}
+
+.yard__layer--near {
+  bottom: 4%;
+  height: 23%;
+  opacity: 0.92;
+}
+
+.yard__layer--mist {
+  bottom: 11%;
+  height: 15%;
+  background:
+    linear-gradient(180deg,
+      rgba(122, 104, 180, 0) 0%,
+      rgba(122, 104, 180, 0.1) 44%,
+      rgba(122, 104, 180, 0.02) 80%,
+      rgba(122, 104, 180, 0) 100%);
+  animation: yard-drift 26s var(--ease-soft) infinite alternate;
+}
+
+@keyframes yard-drift {
+  from { transform: translateX(-2.5%) scaleX(1.02); opacity: 0.8; }
+  to   { transform: translateX(2.5%) scaleX(1.06); opacity: 1; }
+}
+
+.yard__ground {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 15%;
+}
+
+/* затемняющая пелена — лес уходит вниз, центр под конверт остаётся чистым */
+.yard::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(180deg,
+      rgba(5, 4, 11, 0.34) 0%,
+      rgba(5, 4, 11, 0.06) 44%,
+      rgba(5, 4, 11, 0.3) 72%,
+      rgba(5, 4, 11, 0.72) 100%);
+  pointer-events: none;
+}
+
+.yard__layer svg,
+.yard__ground svg { width: 100%; height: 100%; display: block; }
+
+
+
+.cd-main {
+  z-index: 10;
+  padding-top: clamp(5rem, 12vh, 7.5rem);
+  padding-bottom: clamp(2rem, 6vh, 3.5rem);
+  gap: clamp(1.4rem, 4vh, 2.6rem);
+}
+
+body.is-open {
+  min-height: var(--cd-doc, 100svh);
+}
+
+body.is-open .cd-main { justify-content: flex-start; }
+
+/* ═══════════ ПОДСКАЗКА ═══════════ */
+.cd-hint {
+  font-size: var(--fs-small);
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+  margin-bottom: clamp(1.8rem, 6vh, 3.4rem);
+  transition: opacity var(--t-mid) var(--ease-out), transform var(--t-mid) var(--ease-out);
+}
+
+.cd-hint .pumpkin-dot { margin-inline: 0.4em; }
+body.is-open .cd-hint { opacity: 0; transform: translateY(-8px); pointer-events: none; }
+
+/* ═══════════ КОНВЕРТ ═══════════ */
+.cd-stage {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: clamp(1.2rem, 4vh, 2.2rem);
+  perspective: 1800px;
+  perspective-origin: 50% 42%;
+}
+
+.env-wrap {
+  position: relative;
+  width: min(600px, 94vw);
+  aspect-ratio: 430 / 290;
+  perspective: 1800px;
+}
+
+.env {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  cursor: pointer;
+  transform-style: preserve-3d;
+  -webkit-transform-style: preserve-3d;
+  touch-action: manipulation;
+  animation: env-breathe 7.5s var(--ease-soft) infinite;
+}
+
+@keyframes env-breathe {
+  0%, 100% { transform: rotateX(4deg) rotateZ(-0.5deg) translateY(0); }
+  50%      { transform: rotateX(1.5deg) rotateZ(0.5deg) translateY(-7px); }
+}
+
+.env:focus-visible {
+  outline: 2px solid var(--ember);
+  outline-offset: 14px;
+  border-radius: 8px;
+}
+
+.env-scene,
+.env__scene {
+  position: absolute;
+  inset: 0;
+  transform-style: preserve-3d;
+  -webkit-transform-style: preserve-3d;
+}
+
+/* общая бумага */
+.env__back,
+.env__pocket-face,
+.env__flap-out,
+.env__flap-in {
+  background:
+    linear-gradient(158deg, #2b2338 0%, #1d1730 42%, #14101f 100%);
+}
+
+.env__back {
+  position: absolute;
+  inset: 0;
+  border-radius: 6px;
+  box-shadow:
+    0 0 0 1px rgba(169, 152, 233, 0.22) inset,
+    0 26px 60px -18px rgba(0, 0, 0, 0.9);
+  transform: translateZ(-14px);
+}
+
+/* тонкая текстура бумаги */
+.env__back::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background-image: var(--grain-url);
+  background-size: 180px 180px;
+  opacity: 0.16;
+  mix-blend-mode: overlay;
+}
+
+/* ═══ карман ═══ */
+.env__pocket {
+  position: absolute;
+  inset: 0;
+  transform: translateZ(0);
+}
+
+.env__pocket-face {
+  position: absolute;
+  inset: 0;
+  clip-path: polygon(0 0, 50% 46%, 100% 0, 100% 100%, 0 100%);
+  border-radius: 6px;
+  box-shadow:
+    0 0 0 1px rgba(169, 152, 233, 0.26) inset,
+    0 -8px 30px rgba(0, 0, 0, 0.55) inset;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: 6% 7% 7%;
+  gap: 0.35em;
+}
+
+.env__address {
+  font-family: var(--font-hand);
+  font-size: clamp(1rem, 2.7vw, 1.32rem);
+  font-weight: 600;
+  line-height: 1.15;
+  color: #d8cfe8;
+  opacity: 0.82;
+  letter-spacing: 0.01em;
+  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.6);
+  transition: opacity var(--t-slow) var(--ease-out);
+}
+
+.env__stamp {
+  align-self: flex-start;
+  font-size: clamp(0.58rem, 1.5vw, 0.7rem);
+  font-weight: 800;
+  letter-spacing: 0.26em;
+  color: var(--ember);
+  opacity: 0.62;
+  padding: 0.28em 0.6em;
+  border: 1px solid currentColor;
+  border-radius: 3px;
+  transform: rotate(-3deg);
+  transition: opacity var(--t-slow) var(--ease-out);
+}
+
+body.is-open .env__address,
+body.is-open .env__stamp { opacity: 0; }
+
+/* блик, пробегающий по конверту */
+.env__pocket-sheen {
+  position: absolute;
+  inset: 0;
+  clip-path: polygon(0 0, 50% 46%, 100% 0, 100% 100%, 0 100%);
+  border-radius: 6px;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.env__pocket-sheen::after {
+  content: "";
+  position: absolute;
+  top: -60%;
+  left: -70%;
+  width: 48%;
+  height: 240%;
+  background: linear-gradient(100deg, transparent, rgba(239, 234, 255, 0.14), transparent);
+  transform: rotate(14deg);
+  animation: sheen 6.5s var(--ease-soft) infinite;
+}
+
+@keyframes sheen {
+  0%, 62%  { transform: translateX(0) rotate(14deg); }
+  86%, 100% { transform: translateX(320%) rotate(14deg); }
+}
+
+/* ═══ крышка ═══ */
+.env__flap {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 54%;
+  transform-origin: 50% 0;
+  transform: rotateX(0deg) translateZ(3px);
+  transform-style: preserve-3d;
+  -webkit-transform-style: preserve-3d;
+  transition: transform 1.05s var(--ease-out);
+}
+
+body.is-open .env__flap { transform: rotateX(180deg) translateZ(3px); }
+
+.env__flap-out,
+.env__flap-in {
+  position: absolute;
+  inset: 0;
+  clip-path: polygon(0 0, 100% 0, 50% 100%);
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  border-radius: 6px 6px 0 0;
+}
+
+.env__flap-out {
+  box-shadow:
+    0 0 0 1px rgba(169, 152, 233, 0.3) inset,
+    0 10px 26px rgba(0, 0, 0, 0.6);
+  background:
+    linear-gradient(178deg, #322a44 0%, #221b33 55%, #171226 100%);
+}
+
+.env__flap-in {
+  transform: rotateX(180deg);
+  background:
+    linear-gradient(2deg, #0f0c1a 0%, #1a1528 60%, #251e36 100%);
+  box-shadow: 0 0 0 1px rgba(169, 152, 233, 0.18) inset;
+}
+
+/* ═══ печать ═══ */
+.seal {
+  position: absolute;
+  left: 50%;
+  top: 46%;
+  width: 22%;
+  aspect-ratio: 1;
+  transform: translate(-50%, -50%) translateZ(8px);
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: transform 0.5s var(--ease-back), opacity 0.4s var(--ease-out);
+}
+
+.seal svg {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  filter: drop-shadow(0 6px 14px rgba(0, 0, 0, 0.7));
+}
+
+.seal__face {
+  animation: seal-face 5s var(--ease-soft) infinite;
+}
+
+@keyframes seal-face {
+  0%, 100% { opacity: 0.85; }
+  50%      { opacity: 1; }
+}
+
+.seal__glow {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 260%;
+  aspect-ratio: 1;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  pointer-events: none;
+  mix-blend-mode: screen;
+  background: radial-gradient(circle, rgba(255, 138, 30, 0.3) 0%, rgba(224, 27, 60, 0.14) 34%, transparent 66%);
+  animation: seal-pulse 4.2s var(--ease-soft) infinite;
+}
+
+@keyframes seal-pulse {
+  0%, 100% { opacity: 0.6; transform: translate(-50%, -50%) scale(0.92); }
+  50%      { opacity: 1;   transform: translate(-50%, -50%) scale(1.08); }
+}
+
+.seal:hover { transform: translate(-50%, -50%) translateZ(8px) scale(1.1); }
+
+.seal.is-nope { animation: seal-shake 0.42s var(--ease-soft); }
+
+@keyframes seal-shake {
+  0%, 100% { transform: translate(-50%, -50%) translateZ(8px) rotate(0deg); }
+  20%      { transform: translate(calc(-50% - 7px), -50%) translateZ(8px) rotate(-6deg); }
+  45%      { transform: translate(calc(-50% + 6px), -50%) translateZ(8px) rotate(5deg); }
+  70%      { transform: translate(calc(-50% - 3px), -50%) translateZ(8px) rotate(-2deg); }
+}
+
+.seal.is-crack {
+  animation: seal-crack 0.55s var(--ease-out) forwards;
+}
+
+@keyframes seal-crack {
+  0%   { transform: translate(-50%, -50%) translateZ(8px) scale(1);    opacity: 1; }
+  22%  { transform: translate(-50%, -50%) translateZ(14px) scale(1.22);  opacity: 1; }
+  100% { transform: translate(-50%, -50%) translateZ(24px) scale(0.1);   opacity: 0; }
+}
+
+body.is-open .seal { pointer-events: none; }
+
+/* ═══ вспышка света ═══ */
+.env__flash {
+  position: absolute;
+  left: 50%;
+  top: 52%;
+  width: 10%;
+  aspect-ratio: 1;
+  transform: translate(-50%, -50%) translateZ(18px);
+  border-radius: 50%;
+  pointer-events: none;
+  opacity: 0;
+  mix-blend-mode: screen;
+  background: radial-gradient(circle, rgba(255, 236, 200, 0.95) 0%, rgba(255, 178, 87, 0.5) 30%, rgba(122, 92, 255, 0.2) 58%, transparent 76%);
+}
+
+.env__flash.is-on { animation: env-flash 0.9s var(--ease-out) forwards; }
+
+@keyframes env-flash {
+  0%   { opacity: 0;   transform: translate(-50%, -50%) translateZ(18px) scale(0.4); }
+  18%  { opacity: 1;   transform: translate(-50%, -50%) translateZ(18px) scale(3.4); }
+  100% { opacity: 0;   transform: translate(-50%, -50%) translateZ(18px) scale(7); }
+}
+
+/* ═══════════ ПИСЬМО ═══════════ */
+.env__letter {
+  position: absolute;
+  left: 50%;
+  /* письмо должно быть заметно уже конверта, иначе в закрытом виде
+     выглядывает по бокам; при закрытом rotateX сжимает только высоту */
+  width: min(520px, 86vw, 74vh);
+  bottom: 5%;
+  z-index: 1;
+  transform: translateX(-50%) translateY(0) rotateX(56deg);
+  transform-origin: 50% 100%;
+  transition: transform 1.15s var(--ease-out);
+}
+
+.letter {
+  position: relative;
+  border-radius: 4px;
+  box-shadow:
+    0 0 0 1px rgba(120, 96, 62, 0.32) inset,
+    0 30px 60px -16px rgba(0, 0, 0, 0.85);
+  transform-origin: 50% 100%;
+  transform: scale(var(--ls, 1));
+  transition: transform 1.15s var(--ease-out), box-shadow 1.15s var(--ease-out);
+}
+
+.env__letter.is-fitting,
+.env__letter.is-fitting .letter { transition: none !important; }
+
+body.is-open .env__letter {
+  z-index: 3;
+  transform: translateX(-50%) translateY(var(--lt, 0px)) rotateX(0deg);
+}
+
+/* pinned while the final fit is being measured — the rise then animates once */
+body.is-open .env__letter.is-locked {
+  transform: translateX(-50%) translateY(0) rotateX(56deg);
+  transition: none;
+}
+
+body.is-open .letter {
+  transform: scale(var(--ls, 1)) rotate(-0.5deg);
+  box-shadow:
+    0 0 0 1px rgba(120, 96, 62, 0.32) inset,
+    0 46px 90px -20px rgba(0, 0, 0, 0.92),
+    0 0 70px rgba(255, 178, 87, 0.14);
+}
+
+.letter__grain {
+  position: absolute;
+  inset: 0;
+  background-image: var(--grain-url);
+  background-size: 160px 160px;
+  opacity: 0.14;
+  mix-blend-mode: multiply;
+  pointer-events: none;
+}
+
+.letter__art {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 520 / 260;
+  overflow: hidden;
+  box-shadow: 0 6px 22px rgba(0, 0, 0, 0.35);
+}
+
+.letter__art svg { width: 100%; height: 100%; display: block; }
+
+.letter__art-glow {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  mix-blend-mode: screen;
+  background: radial-gradient(60% 70% at 74% 26%, rgba(255, 210, 150, 0.18), transparent 62%);
+  animation: art-glow 6s var(--ease-soft) infinite;
+}
+
+@keyframes art-glow {
+  0%, 100% { opacity: 0.5; }
+  50%      { opacity: 1; }
+}
+
+.letter__body {
+  position: relative;
+  /* бумага живёт на теле письма, а не на .letter: тогда при закрытом конверте
+     строка opacity: 0 убирает и светлую полосу под иллюстрацией */
+  background: linear-gradient(168deg, #f3e6cc 0%, #e6d4b0 46%, #d8c39c 100%);
+  padding: clamp(1.2rem, 3.8vw, 1.9rem) clamp(1.3rem, 4.4vw, 2.2rem) clamp(1.4rem, 4.4vw, 2.1rem);
+  color: #33210f;
+  opacity: 1;
+  transition: opacity 0.5s var(--ease-soft);
+}
+
+/* закрытый конверт: наружу торчит только иллюстрация — с сохранением высоты,
+   чтобы язык письма остался, но бумага под ним не выглядывала */
+body:not(.is-open) .letter__body { opacity: 0; }
+
+.letter__date {
+  font-size: clamp(0.66rem, 1.7vw, 0.82rem);
+  font-weight: 800;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: #a1702f;
+  opacity: 0.9;
+}
+
+.letter__title {
+  margin-top: 0.25em;
+  font-size: clamp(1.9rem, 6.4vw, 3.15rem);
+  line-height: 1;
+  color: #2b1a0a;
+}
+
+.letter__rule {
+  display: block;
+  width: 58px;
+  height: 2px;
+  margin: clamp(0.55rem, 2vw, 0.9rem) 0;
+  background: linear-gradient(90deg, #b8823a, rgba(184, 130, 58, 0));
+}
+
+.letter__text {
+  font-family: var(--font-hand);
+  font-size: clamp(1.36rem, 4.6vw, 1.98rem);
+  font-weight: 500;
+  line-height: 1.34;
+  color: #3a2210;
+  letter-spacing: 0.002em;
+}
+
+.letter__text p + p { margin-top: 0.58em; }
+
+.letter__sign {
+  margin-top: clamp(1rem, 3.4vw, 1.6rem);
+  padding-top: clamp(0.8rem, 2.4vw, 1.1rem);
+  border-top: 1px solid rgba(140, 104, 58, 0.3);
+  display: flex;
+  flex-direction: column;
+  gap: 0.15em;
+}
+
+.letter__sign-name {
+  font-family: var(--font-sign);
+  font-size: clamp(1.38rem, 4.6vw, 2.05rem);
+  line-height: 1.2;
+  color: #7a2d1b;
+  transform: rotate(-1.4deg);
+  transform-origin: left center;
+}
+
+.letter__sign-note {
+  font-size: clamp(0.56rem, 1.5vw, 0.7rem);
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: rgba(80, 52, 24, 0.6);
+  opacity: 1;
+}
+
+/* ═══════════ ДЕЙСТВИЯ ПОСЛЕ ОТКРЫТИЯ ═══════════ */
+.cd-actions {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 45;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(0.6rem, 2vw, 1rem);
+  padding:
+    clamp(1.4rem, 4vh, 2.4rem)
+    var(--pad-x)
+    calc(clamp(0.9rem, 3vh, 1.4rem) + env(safe-area-inset-bottom));
+  background: linear-gradient(180deg, rgba(6, 5, 10, 0) 0%, rgba(6, 5, 10, 0.82) 46%, rgba(6, 5, 10, 0.95) 100%);
+  opacity: 0;
+  transform: translateY(14px);
+  pointer-events: none;
+  transition: opacity 0.7s var(--ease-out) 0.4s, transform 0.7s var(--ease-out) 0.4s;
+}
+
+.cd-actions[hidden] { display: none; }
+
+body.is-open .cd-actions {
+  opacity: 1;
+  transform: none;
+  pointer-events: auto;
+}
+
+.btn__short { display: none; }
+
+@media (max-width: 620px) {
+  .cd-actions { gap: 0.45rem; padding-inline: 0.7rem; }
+  .cd-actions .btn {
+    min-height: 52px;
+    padding: 0.7em 0.95em;
+    font-size: 0.7rem;
+    letter-spacing: 0.08em;
+  }
+  .btn__long { display: none; }
+  .btn__short { display: inline; }
+}
+
+body.is-open .env {
+  animation: none;
+  transform: translateY(14px) scale(0.93);
+  opacity: 0.72;
+  transition: transform 1.15s var(--ease-out), opacity 1.15s var(--ease-out);
+}
+
+/* ═══════════ ТЁПЛЫЙ ФОН ПОСЛЕ ОТКРЫТИЯ ═══════════ */
+body.is-open::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background:
+    radial-gradient(80% 60% at 50% 34%, rgba(255, 152, 54, 0.14), transparent 62%),
+    radial-gradient(60% 50% at 50% 62%, rgba(122, 92, 255, 0.1), transparent 70%);
+  animation: cd-warm 1.4s var(--ease-out);
+}
+
+@keyframes cd-warm {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+/* ═══════════ АДАПТИВ ═══════════ */
+/* ═══════════ ЗОЛОТАЯ РАМКА С ПРИЗРАКАМИ ═══════════ */
+.env__frame {
+  position: absolute;
+  inset: 1.8%;
+  z-index: 6;
+  pointer-events: none;
+  border: 1px solid transparent;
+  border-image: linear-gradient(142deg,
+    #fbf1d2 0%, #e0bf72 16%, #96701f 40%,
+    #f7e6b4 56%, #b3822c 74%, #efd79b 100%) 1;
+  border-radius: 4px;
+  box-shadow:
+    0 0 26px -8px rgba(216, 177, 97, 0.4),
+    inset 0 0 20px -14px rgba(247, 231, 180, 0.55);
+}
+
+.env__frame::after {
+  content: "";
+  position: absolute;
+  inset: 3px;
+  border-radius: 2px;
+  border: 1px solid rgba(216, 177, 97, 0.2);
+}
+
+.env__corner {
+  position: absolute;
+  width: clamp(17px, 4.4vw, 30px);
+  aspect-ratio: 40 / 44;
+  filter: drop-shadow(0 3px 7px rgba(0, 0, 0, 0.75));
+  animation: gm-float 5.4s var(--ease-soft) infinite;
+}
+
+.env__corner svg { width: 100%; height: 100%; display: block; overflow: visible; }
+
+.env__corner .gm-body {
+  fill: #2b0d14;
+  stroke: rgba(216, 177, 97, 0.5);
+  stroke-width: 1;
+  vector-effect: non-scaling-stroke;
+}
+
+.env__corner .gm-eye {
+  fill: #ffcf7a;
+  filter: drop-shadow(0 0 3px rgba(255, 178, 87, 0.95));
+  animation: gm-blink 4.4s steps(1) infinite;
+}
+
+.env__corner .gm-mouth {
+  fill: none;
+  stroke: rgba(255, 178, 87, 0.5);
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  vector-effect: non-scaling-stroke;
+}
+
+.env__corner--tl { left: -4%;  top: -7%;    transform: rotate(-14deg); }
+.env__corner--tr { right: -4%; top: -7%;    transform: rotate(14deg);  animation-delay: -1.35s; }
+.env__corner--bl { left: -4%;  bottom: -7%; transform: rotate(14deg);  animation-delay: -2.7s; }
+.env__corner--br { right: -4%; bottom: -7%; transform: rotate(-14deg); animation-delay: -4.05s; }
+
+@keyframes gm-float {
+  0%, 100% { translate: 0 0; }
+  50%      { translate: 0 -3.5px; }
+}
+
+@keyframes gm-blink {
+  0%, 86%, 100% { opacity: 1; }
+  88%           { opacity: 0.15; }
+  92%           { opacity: 0.9; }
+}
+
+/* ═══════════ АДРЕСАТ В ПИСЬМЕ ═══════════ */
+.letter__to {
+  font-family: var(--font-hand);
+  font-size: clamp(1.1rem, 3.8vw, 1.6rem);
+  font-weight: 600;
+  line-height: 1.2;
+  color: #7a2d1b;
+  margin-bottom: 0.35em;
+}
+
+/* ═══════════ РЕДАКТОР ═══════════ */
+.editor {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+.editor[hidden] { display: none; }
+
+.editor__scrim {
+  position: absolute;
+  inset: 0;
+  background: rgba(4, 3, 9, 0.78);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  animation: cd-fade 0.35s var(--ease-out);
+}
+
+@keyframes cd-fade {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+.editor__sheet {
+  position: relative;
+  width: min(620px, 100%);
+  max-height: min(88svh, 780px);
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+  padding: clamp(1.3rem, 4vw, 2rem) clamp(1.2rem, 4vw, 2rem)
+           calc(clamp(1.3rem, 4vw, 2rem) + env(safe-area-inset-bottom));
+  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+  animation: sheet-up 0.45s var(--ease-out);
+}
+
+@keyframes sheet-up {
+  from { transform: translateY(28px); opacity: 0; }
+  to   { transform: none; opacity: 1; }
+}
+
+.editor__title {
+  font-size: clamp(1.35rem, 4.6vw, 1.9rem);
+  color: var(--text);
+}
+
+.editor__lead {
+  margin-top: 0.5rem;
+  font-size: var(--fs-small);
+  line-height: 1.6;
+  max-width: 46ch;
+}
+
+.field {
+  display: block;
+  margin-top: clamp(0.9rem, 2.6vw, 1.2rem);
+}
+
+.field__label {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.6rem;
+  font-size: var(--fs-small);
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: 0.45em;
+}
+
+.field__count {
+  font-style: normal;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: none;
+  color: var(--text-faint);
+}
+
+.field__input {
+  display: block;
+  width: 100%;
+  min-height: 48px;
+  padding: 0.75em 1em;
+  border-radius: 14px;
+  color: var(--text);
+  background: var(--ink-glass);
+  box-shadow: 0 0 0 1px var(--line) inset;
+  transition: box-shadow var(--t-fast) var(--ease-out), background var(--t-fast);
+  touch-action: manipulation;
+}
+
+.field__input::placeholder { color: var(--text-faint); }
+
+.field__input:hover { box-shadow: 0 0 0 1px var(--line-strong) inset; }
+
+.field__input:focus {
+  outline: none;
+  background: var(--ink-glass-hi);
+  box-shadow:
+    0 0 0 1px var(--line-strong) inset,
+    0 0 0 3px rgba(122, 92, 255, 0.28);
+}
+
+.field__input--area {
+  min-height: 132px;
+  resize: vertical;
+  font-family: var(--font-hand);
+  font-size: 1.2rem;
+  line-height: 1.42;
+}
+
+.editor__note {
+  margin-top: 0.9rem;
+  font-size: var(--fs-small);
+  color: var(--poison);
+  min-height: 1.2em;
+}
+
+.editor__note[hidden] { display: none; }
+
+.editor__row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  margin-top: clamp(1.1rem, 3vw, 1.5rem);
+}
+
+.editor__row .btn { flex: 1 1 auto; min-width: 140px; }
+
+/* ═══════════ АДАПТИВ ═══════════ */
+@media (max-width: 560px) {
+  .env-wrap { width: 92vw; }
+  .cd-main { padding-top: 4.6rem; }
+  .editor__sheet { border-radius: var(--radius-lg) var(--radius-lg) 0 0; }
+  .editor__row .btn { min-width: 100%; }
+}
+
+@media (max-height: 680px) and (orientation: landscape) {
+  .env-wrap { width: min(74vh, 62vw); }
+  .cd-hint { font-size: 0.7rem; margin-bottom: 0.4rem; }
+  .cd-main { padding-top: 3.4rem; padding-bottom: 0.8rem; gap: 0.7rem; }
+  .env__letter { width: min(78vw, 500px); transform: translateX(-50%) rotateX(72deg); }
+
+  /* в альбоме кнопок стало четыре — ужимаем ленту, иначе она съедает
+     высоту, отведённую письму, и письмо наезжает на кнопки */
+  .cd-actions {
+    gap: 0.4rem;
+    padding-top: 0.5rem;
+    padding-bottom: calc(0.4rem + env(safe-area-inset-bottom));
+  }
+  .cd-actions .btn {
+    min-height: 46px;
+    padding: 0.55em 0.9em;
+    font-size: 0.7rem;
+    letter-spacing: 0.08em;
+  }
+  .cd-actions .btn__long { display: none; }
+  .cd-actions .btn__short { display: inline; }
+
+  .letter {
+    display: grid;
+    grid-template-columns: 0.85fr 1.15fr;
+    align-items: stretch;
+  }
+
+  .letter__art {
+    height: 100%;
+    aspect-ratio: auto;
+    border-right: 1px solid rgba(120, 96, 62, 0.25);
+  }
+
+  .letter__body {
+    padding: 0.7rem 0.9rem 0.8rem;
+  }
+
+  .letter__title { font-size: clamp(1.1rem, 4.9vh, 1.7rem); }
+  .letter__rule { margin: 0.35rem 0; }
+  .letter__text { font-size: clamp(0.86rem, 2.75vh, 1.16rem); line-height: 1.3; }
+  .letter__text p + p { margin-top: 0.45em; }
+  .letter__sign { margin-top: 0.6rem; padding-top: 0.5rem; }
+  .letter__sign-name { font-size: clamp(1rem, 3.3vh, 1.35rem); }
+  .cd-actions { padding-top: 1rem; padding-bottom: calc(0.6rem + env(safe-area-inset-bottom)); }
+}
+
+/* ═══════════ REDUCED MOTION ═══════════ */
+@media (prefers-reduced-motion: reduce) {
+  .env { animation: none; }
+  .env__flap { transition: none; }
+  .env__flap-out { display: none; }
+  .env__flap-in { display: block; transform: none; clip-path: polygon(0 0, 100% 0, 100% 0, 0 0); }
+  .env__pocket-sheen { display: none; }
+  .env__letter { transition: none; }
+  .letter { transform: none; }
+  body.is-open .letter { transform: rotate(-0.5deg) scale(var(--ls, 1)); }
+  body.is-open .env__letter { transform: translateX(-50%) translateY(var(--lt, 0px)); }
+  .seal__glow,
+  .seal__face,
+  .letter__art-glow { animation: none; }
+  .env__flash.is-on { animation: none; opacity: 0; }
+  .seal.is-crack { animation: none; opacity: 0; }
+}

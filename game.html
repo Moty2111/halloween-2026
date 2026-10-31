@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="ru" class="no-js">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#06050a">
+<meta name="description" content="Сахарный Поймач — хэллоуин-аркада: лови конфеты, не лови крыс.">
+<title>Сахарный Поймач · Хэллоуин</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;500;600;700&family=Manrope:wght@300;400;600;700;800&family=Marmelad&family=Marck+Script&family=Playfair+Display:wght@500;700;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/base.css">
+<link rel="stylesheet" href="assets/css/game.css">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='26' font-size='26'>&#127924;</text></svg>">
+</head>
+<body>
+<a class="skip-link" href="#main">К игре</a>
+
+<canvas class="fx-layer" id="bg-fog" aria-hidden="true"></canvas>
+<canvas class="fx-layer" id="fx-parts" aria-hidden="true"></canvas>
+
+<header class="topbar">
+  <a class="topbar__brand" href="index.html"><span>&#129418;</span> <b>Ночь&nbsp;тыкв</b></a>
+  <nav class="navlinks" aria-label="Основная навигация">
+    <a href="index.html" data-page="index">Сцена</a>
+    <a href="game.html"  data-page="game">Игра</a>
+    <a href="card.html"  data-page="card">Открытка</a>
+  </nav>
+</header>
+
+<main id="main" class="page cc-page">
+
+  <div class="cc-stage" id="cc-stage">
+    <div class="cc-frame" id="cc-frame">
+      <canvas id="cc-canvas" class="cc-canvas" role="img"
+              aria-label="Игровое поле «Сахарный Поймач»: падают конфеты и яд, лови конфеты ведром и избегай крыс и слизи"></canvas>
+
+      <div class="cc-flash" id="cc-flash" aria-hidden="true"></div>
+
+      <div class="cc-hud" id="cc-hud">
+        <div class="cc-hud__row">
+          <div class="cc-chip cc-chip--score">
+            <span class="cc-chip__label">Счёт</span>
+            <strong class="cc-chip__value" id="cc-score">0</strong>
+          </div>
+
+<div class="cc-chip cc-chip--mid" id="cc-timechip">
+              <span class="cc-chip__label">До рассвета</span>
+              <strong class="cc-chip__value cc-chip__value--time" id="cc-time">60</strong>
+              <span class="cc-timebar" aria-hidden="true"><i class="cc-timebar__fill" id="cc-timefill"></i></span>
+              <span class="cc-chip__note" id="cc-level">Раунд 1</span>
+              <span class="cc-chip__note" id="cc-ca" hidden>Рядов: 5</span>
+            </div>
+
+          <div class="cc-chip cc-chip--lives">
+            <span class="cc-chip__label">Жизни</span>
+            <span class="cc-lives" id="cc-lives" role="img" aria-label="Жизни: 3">
+              <i class="cc-life" aria-hidden="true">&#127924;</i>
+              <i class="cc-life" aria-hidden="true">&#127924;</i>
+              <i class="cc-life" aria-hidden="true">&#127924;</i>
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <p class="cc-combo" id="cc-combo" aria-hidden="true"></p>
+      <p class="cc-count" id="cc-count" aria-hidden="true"></p>
+
+      <section class="cc-screen" id="cc-screen-start">
+        <div class="cc-panel glass">
+          <p class="eyebrow">Ночь тыкв · Аркада</p>
+
+          <div class="cc-modes" role="tablist" aria-label="Выбор игры">
+            <button class="cc-mode is-on" id="cc-mode-candy" role="tab" type="button"
+                    aria-selected="true" data-mode="candy">
+              <span class="cc-mode__name">Сахарный Поймач</span>
+              <span class="cc-mode__desc">Лови конфеты, не лови крыс</span>
+            </button>
+            <button class="cc-mode" id="cc-mode-cauldron" role="tab" type="button"
+                    aria-selected="false" data-mode="cauldron">
+              <span class="cc-mode__name">Котёл</span>
+              <span class="cc-mode__desc">Отбивай тыквы, разбивай надгробья</span>
+            </button>
+          </div>
+
+          <ul class="cc-rules" id="cc-rules-candy">
+            <li><span class="cc-rules__ico" aria-hidden="true">&#127852;</span><span><b>Ведро едет за пальцем</b> или за курсором. На клавиатуре — стрелки или <b>A</b> и <b>D</b>.</span></li>
+            <li><span class="cc-rules__ico" aria-hidden="true">&#129497;</span><span><b>Крыса и зелёная слизь — яд.</b> Поймал — минус жизнь, вспышка и тряска.</span></li>
+            <li><span class="cc-rules__ico" aria-hidden="true">&#128293;</span><span><b>Три конфеты подряд</b> — множитель ×2, потом ×3 и ×4. Серия ≥5 включает slow-mo.</span></li>
+            <li><span class="cc-rules__ico" aria-hidden="true">&#9203;</span><span><b>60 секунд, 3 жизни.</b> Каждые 8 секунд падает всё быстрее.</span></li>
+          </ul>
+
+          <ul class="cc-rules" id="cc-rules-cauldron" hidden>
+            <li><span class="cc-rules__ico" aria-hidden="true">&#129380;</span><span><b>Отбивай тыкву,</b> не дай ей упасть. Угол отскока зависит от точки удара по котлу.</span></li>
+            <li><span class="cc-rules__ico" aria-hidden="true">&#128270;</span><span><b>Разбивай надгробья.</b> Каждый третий ряд стоит дороже — там светящиеся.</span></li>
+            <li><span class="cc-rules__ico" aria-hidden="true">&#129513;</span><span><b>Зелёные надгробья — слизь.</b> Не трогай: минус жизнь и тряска.</span></li>
+            <li><span class="cc-rules__ico" aria-hidden="true">&#127760;</span><span><b>3 жизни, 5 волн.</b> С каждой волной мяч летает быстрее, а ряды короче.</span></li>
+          </ul>
+
+          <div class="cc-toggle-wrap" id="cc-endless-wrap">
+            <label class="cc-toggle">
+              <input type="checkbox" id="cc-endless">
+              <span class="cc-toggle__track" aria-hidden="true"><span class="cc-toggle__dot"></span></span>
+              <span class="cc-toggle__text">
+                Бесконечная ночь
+                <em>таймер не закончит игру — начнёт новую волну</em>
+              </span>
+            </label>
+          </div>
+
+          <div class="cc-panel__row">
+            <button class="cc-btn cc-btn--primary" id="cc-start-btn" type="button">Начать охоту</button>
+            <p class="cc-best">Рекорд: <b id="cc-best-start">0</b></p>
+          </div>
+        </div>
+      </section>
+
+      <section class="cc-screen" id="cc-screen-over" hidden>
+        <div class="cc-panel glass">
+          <p class="eyebrow" id="cc-over-eyebrow">Смена окончена</p>
+          <h2 class="cc-panel__title display" id="cc-over-title">Итоги</h2>
+          <p class="cc-panel__note" id="cc-over-note">Новый рекорд. Где-то в подвале кто-то завидует.</p>
+
+          <div class="cc-stats">
+            <div class="cc-stat"><span class="cc-stat__k">Счёт</span><b class="cc-stat__v" id="cc-final-score">0</b></div>
+            <div class="cc-stat"><span class="cc-stat__k">Рекорд</span><b class="cc-stat__v" id="cc-final-best">0</b></div>
+            <div class="cc-stat"><span class="cc-stat__k">Конфет</span><b class="cc-stat__v" id="cc-final-candy">0</b></div>
+            <div class="cc-stat"><span class="cc-stat__k">Лучшее комбо</span><b class="cc-stat__v" id="cc-final-combo">0</b></div>
+          </div>
+
+          <div class="cc-panel__row">
+            <button class="cc-btn cc-btn--primary" id="cc-retry-btn" type="button">Ещё раз</button>
+            <a class="cc-btn cc-btn--ghost" href="index.html">На сцену</a>
+          </div>
+        </div>
+      </section>
+
+      <section class="cc-screen" id="cc-screen-pause" hidden>
+        <div class="cc-panel glass cc-panel--slim">
+          <p class="eyebrow">Пауза</p>
+          <h2 class="cc-panel__title display">Ведро ждёт</h2>
+          <p class="cc-panel__lead">Таймер стоит. Крысы тоже стоят. К счастью.</p>
+          <div class="cc-panel__row">
+            <button class="cc-btn cc-btn--primary" id="cc-resume-btn" type="button">Продолжить</button>
+            <button class="cc-btn cc-btn--ghost" id="cc-quit-btn" type="button">В начало</button>
+          </div>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <div class="cc-foot">
+    <p class="cc-foot__hint">Ведро следует за пальцем. <span class="faint">Пробел — пауза, <span class="faint">P</span> тоже.</span></p>
+    <button class="cc-btn cc-btn--ghost cc-btn--sm" id="cc-pause-btn" type="button" hidden>Пауза</button>
+  </div>
+
+  <p class="sr-only" id="cc-live" role="status" aria-live="polite"></p>
+</main>
+
+<script src="assets/js/webgl-bg.js" defer></script>
+<script src="assets/js/particles.js" defer></script>
+<script src="assets/js/core.js" defer></script>
+<script src="assets/js/game.js" defer></script>
+</body>
+</html>

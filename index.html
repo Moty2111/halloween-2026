@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="ru" class="no-js">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#06050a">
+<meta name="description" content="Ночь тыкв — хэллоуин-сцена: туман, железные ворота, аркада «Сахарный Поймач» и открытка, написанная при свече.">
+<title>Ночь тыкв · Хэллоуин</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;500;600;700&family=Manrope:wght@300;400;600;700;800&family=Marmelad&family=Marck+Script&family=Playfair+Display:wght@500;700;900&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="assets/css/base.css">
+<link rel="stylesheet" href="assets/css/index.css">
+
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='26' font-size='26'>&#129418;</text></svg>">
+<script>
+  (function () {
+    try {
+      if (!sessionStorage.getItem('hw.intro.seen') &&
+          !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        document.documentElement.classList.add('is-intro');
+      }
+    } catch (e) {}
+  })();
+</script>
+</head>
+
+<body>
+<a class="skip-link" href="#hero">К содержимому</a>
+
+<header class="topbar">
+  <a class="topbar__brand" href="index.html"><span>&#129418;</span> <b>Ночь&nbsp;тыкв</b></a>
+  <nav class="navlinks" aria-label="Основная навигация">
+    <a href="index.html" data-page="index">Сцена</a>
+    <a href="game.html"  data-page="game">Игра</a>
+    <a href="card.html"  data-page="card">Открытка</a>
+  </nav>
+</header>
+
+<canvas class="fx-layer" id="bg-fog" aria-hidden="true"></canvas>
+
+<!-- ══════════ СЦЕНА ══════════ -->
+<div class="scene" aria-hidden="true">
+
+  <!-- дальний лес -->
+  <div class="layer layer--skyline" data-depth="6">
+    <svg class="skyline" viewBox="0 0 1440 420" preserveAspectRatio="xMidYMax slice">
+      <g id="pine-far"></g>
+    </svg>
+  </div>
+
+  <div class="layer layer--hills" data-depth="12">
+    <svg class="hills" viewBox="0 0 1440 260" preserveAspectRatio="xMidYMax slice">
+      <path fill="#0a0812" d="M0,260 L0,176 C120,140 210,190 320,168 C440,142 500,186 620,164 C740,140 820,182 940,160 C1060,138 1180,180 1300,158 C1370,146 1420,164 1440,154 L1440,260 Z"/>
+    </svg>
+  </div>
+
+  <div class="layer layer--mid" data-depth="24">
+    <svg class="trees-mid" viewBox="0 0 1440 380" preserveAspectRatio="xMidYMax slice">
+      <g id="pine-mid"></g>
+      <!-- кладбище -->
+      <g class="tombstones" fill="#07060d">
+        <path d="M236,380 L236,300 C236,286 244,278 254,278 C264,278 272,286 272,300 L272,380 Z"/>
+        <path d="M1156,380 L1156,306 C1156,290 1166,280 1178,280 C1190,280 1200,290 1200,306 L1200,380 Z"/>
+        <path d="M1104,380 L1104,330 C1104,320 1112,313 1122,313 C1132,313 1140,320 1140,330 L1140,380 Z"/>
+      </g>
+    </svg>
+  </div>
+
+  <!-- замок, который ворота охраняют -->
+  <div class="layer layer--castle" data-depth="30">
+    <svg class="castle" viewBox="0 0 900 470" preserveAspectRatio="xMidYMax meet">
+      <defs>
+        <filter id="castleGlow" x="-90%" y="-90%" width="280%" height="280%">
+          <feGaussianBlur stdDeviation="12"/>
+        </filter>
+        <!-- камень светлее сосен: тёмный силуэт сливался с лесом -->
+        <linearGradient id="castleStone" x1="0" y1="0" x2="1" y2="0.3">
+          <stop offset="0"   stop-color="#100d22"/>
+          <stop offset="0.6" stop-color="#1b1638"/>
+          <stop offset="1"   stop-color="#2a2250"/>
+        </linearGradient>
+      </defs>
+      <g id="castle">
+        <g fill="url(#castleStone)">
+          <!-- крепостная стена -->
+          <path d="M20,470 L20,352 L86,352 L86,330 L116,330 L116,352 L188,352 L188,330 L218,330 L218,352
+                   L300,352 L300,330 L330,330 L330,352 L570,352 L570,330 L600,330 L600,352
+                   L682,352 L682,330 L712,330 L712,352 L784,352 L784,330 L814,330 L814,352
+                   L880,352 L880,470 Z"/>
+          <!-- левая башня -->
+          <path d="M104,470 L104,236 L214,236 L214,470 Z"/>
+          <path d="M104,236 L159,132 L214,236 Z"/>
+          <!-- правая башня -->
+          <path d="M686,470 L686,206 L796,206 L796,470 Z"/>
+          <path d="M686,206 L741,100 L796,206 Z"/>
+          <!-- центральная башня -->
+          <path d="M400,470 L400,150 L500,150 L500,470 Z"/>
+          <path d="M400,150 L450,44 L500,150 Z"/>
+          <!-- дозорная над башней -->
+          <path d="M296,470 L296,296 L316,296 L316,276 L336,276 L336,296 L356,296 L356,470 Z"/>
+          <path d="M544,470 L544,270 L564,270 L564,250 L584,250 L584,270 L604,270 L604,470 Z"/>
+        </g>
+
+        <!-- лунная кромка справа -->
+        <g fill="none" stroke="#b0a4e8" stroke-opacity="0.34" stroke-width="2.4" stroke-linejoin="round">
+          <path d="M214,236 L214,470"/>
+          <path d="M214,236 L159,132 L104,236"/>
+          <path d="M796,206 L796,470"/>
+          <path d="M796,206 L741,100 L686,206"/>
+          <path d="M500,150 L500,470"/>
+          <path d="M500,150 L450,44 L400,150"/>
+          <path d="M880,352 L880,470 M814,330 L814,352"/>
+        </g>
+
+        <!-- мгла у подножия: отделяет замок от леса -->
+        <ellipse cx="450" cy="470" rx="470" ry="58" fill="#3a3160" opacity="0.22" filter="url(#castleGlow)"/>
+
+        <!-- окна: единственное, что выдаёт, что внутри кто-то есть -->
+        <g fill="#ffab45">
+          <rect x="132" y="278" width="12" height="17" rx="2"/>
+          <rect x="170" y="278" width="12" height="17" rx="2"/>
+          <rect x="150" y="330" width="12" height="17" rx="2"/>
+          <rect x="714" y="252" width="12" height="17" rx="2"/>
+          <rect x="752" y="252" width="12" height="17" rx="2"/>
+          <rect x="732" y="304" width="12" height="17" rx="2"/>
+          <rect x="424" y="196" width="13" height="18" rx="2"/>
+          <rect x="464" y="196" width="13" height="18" rx="2"/>
+          <rect x="424" y="248" width="13" height="18" rx="2"/>
+          <rect x="464" y="248" width="13" height="18" rx="2"/>
+          <rect x="444" y="300" width="13" height="18" rx="2"/>
+          <rect x="316" y="330" width="10" height="14" rx="2"/>
+          <rect x="566" y="306" width="10" height="14" rx="2"/>
+          <rect x="96" y="380" width="12" height="17" rx="2"/>
+          <rect x="250" y="380" width="12" height="17" rx="2"/>
+          <rect x="640" y="380" width="12" height="17" rx="2"/>
+          <rect x="796" y="380" width="12" height="17" rx="2"/>
+        </g>
+        <!-- дымка над окнами -->
+        <g fill="#ff8a1e" opacity="0.14" filter="url(#castleGlow)">
+          <circle cx="138" cy="286" r="26"/>
+          <circle cx="176" cy="286" r="26"/>
+          <circle cx="156" cy="338" r="26"/>
+          <circle cx="720" cy="260" r="26"/>
+          <circle cx="758" cy="260" r="26"/>
+          <circle cx="738" cy="312" r="26"/>
+          <circle cx="430" cy="204" r="28"/>
+          <circle cx="470" cy="204" r="28"/>
+          <circle cx="450" cy="256" r="28"/>
+          <circle cx="450" cy="308" r="28"/>
+          <circle cx="102" cy="388" r="26"/>
+          <circle cx="256" cy="388" r="26"/>
+          <circle cx="646" cy="388" r="26"/>
+          <circle cx="802" cy="388" r="26"/>
+        </g>
+      </g>
+    </svg>
+  </div>
+
+  <!-- ворота -->
+  <div class="layer layer--gate" data-depth="40">
+    <div class="gate">
+      <svg class="gate__svg" viewBox="0 0 800 560" preserveAspectRatio="xMidYMax meet">
+        <defs>
+          <linearGradient id="stoneGrad" x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0"   stop-color="#2b2740"/>
+            <stop offset="0.35" stop-color="#191527"/>
+            <stop offset="1"   stop-color="#0c0a15"/>
+          </linearGradient>
+          <linearGradient id="stoneCap" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0"   stop-color="#3a3552"/>
+            <stop offset="0.5" stop-color="#1d1930"/>
+            <stop offset="1"   stop-color="#0b0913"/>
+          </linearGradient>
+          <linearGradient id="ironGrad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0"   stop-color="#5a5180"/>
+            <stop offset="0.45" stop-color="#302848"/>
+            <stop offset="1"   stop-color="#191428"/>
+          </linearGradient>
+          <linearGradient id="ironHi" x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0"   stop-color="#9b8fd4" stop-opacity="0.95"/>
+            <stop offset="0.5" stop-color="#463c6e" stop-opacity="0.45"/>
+            <stop offset="1"   stop-color="#9b8fd4" stop-opacity="0.9"/>
+          </linearGradient>
+          <radialGradient id="ironPool" cx="0.5" cy="0.5" r="0.5">
+            <stop offset="0"   stop-color="#8b7ec4" stop-opacity="0.42"/>
+            <stop offset="0.6" stop-color="#4a3f74" stop-opacity="0.16"/>
+            <stop offset="1"   stop-color="#000000" stop-opacity="0"/>
+          </radialGradient>
+          <linearGradient id="stoneBase" x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0"   stop-color="#37314f"/>
+            <stop offset="0.42" stop-color="#1e1a32"/>
+            <stop offset="1"   stop-color="#0d0b17"/>
+          </linearGradient>
+          <linearGradient id="stonePlinth" x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0"   stop-color="#2c2742"/>
+            <stop offset="0.5" stop-color="#15121f"/>
+            <stop offset="1"   stop-color="#090811"/>
+          </linearGradient>
+          <!-- гаргулья на тон светлее пилона: на ночном небе одинаковый
+               камень с фоном сливается и фигура перестаёт читаться -->
+          <linearGradient id="gargGrad" x1="0" y1="0" x2="1" y2="0.6">
+            <stop offset="0"   stop-color="#6a5f92"/>
+            <stop offset="0.45" stop-color="#443c68"/>
+            <stop offset="1"   stop-color="#211c36"/>
+          </linearGradient>
+          <linearGradient id="gargWing" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0"   stop-color="#584e7d"/>
+            <stop offset="0.6" stop-color="#332c50"/>
+            <stop offset="1"   stop-color="#1a1629"/>
+          </linearGradient>
+
+          <!-- ═══ ПИЛОН: ствол, цоколь, шейка, капитель. Левая копия — источник,
+               правая получается зеркалом относительно центра вьюбокса x=400 ═══ -->
+          <g id="pillarStone">
+            <!-- цоколь -->
+            <rect x="-11" y="516" width="108" height="44" fill="url(#stonePlinth)"/>
+            <path d="M-2,504 H88 L97,516 H-11 Z" fill="url(#stoneCap)"/>
+            <rect x="-2" y="486" width="90" height="18" rx="3" fill="url(#stoneBase)"/>
+
+            <!-- ствол -->
+            <rect x="0" y="94" width="86" height="392" fill="url(#stoneGrad)"/>
+
+            <!-- швы кладки со смещением рядов -->
+            <g fill="none" stroke="#04030a" stroke-opacity="0.4" stroke-width="1.8" stroke-linecap="square">
+              <path d="M0,143 H86 M0,192 H86 M0,241 H86 M0,290 H86 M0,339 H86 M0,388 H86 M0,437 H86"/>
+              <path d="M30,94 V143 M58,94 V143 M44,143 V192 M30,192 V241 M58,192 V241
+                       M44,241 V290 M30,290 V339 M58,290 V339 M44,339 V388
+                       M30,388 V437 M58,388 V437 M44,437 V486" stroke-opacity="0.26"/>
+            </g>
+            <!-- фаска: лунная кромка под каждым швом -->
+            <g fill="none" stroke="#8a7fc4" stroke-opacity="0.14" stroke-width="1" stroke-linecap="square">
+              <path d="M0,145 H86 M0,194 H86 M0,243 H86 M0,292 H86 M0,341 H86 M0,390 H86 M0,439 H86"/>
+            </g>
+
+            <!-- потёки и сколы -->
+            <g stroke="#6a6090" stroke-opacity="0.07" stroke-width="7" fill="none">
+              <path d="M14,94 V486"/><path d="M52,94 V486"/><path d="M72,94 V486"/>
+            </g>
+            <g fill="#04030a" opacity="0.55">
+              <path d="M0,212 l7,-3 l2,9 l-9,1 Z"/>
+              <path d="M86,328 l-6,-2 l-2,8 l8,1 Z"/>
+              <path d="M0,402 l6,-2 l2,8 l-8,1 Z"/>
+              <path d="M86,178 l-5,-2 l-2,7 l7,1 Z"/>
+            </g>
+
+            <!-- шейка и капитель -->
+            <rect x="-2" y="86" width="90" height="8" fill="url(#stoneBase)"/>
+            <path d="M-11,62 H97 L82,86 H4 Z" fill="url(#stoneCap)"/>
+            <rect x="-11" y="46" width="108" height="16" rx="2" fill="url(#stoneCap)"/>
+            <rect x="-11" y="46" width="108" height="3" rx="1" fill="#6e63a0" opacity="0.35"/>
+
+            <!-- свет по внутренней кромке -->
+            <rect x="78" y="94" width="3" height="392" fill="#8f83c8" opacity="0.3"/>
+            <rect x="0" y="94" width="2" height="392" fill="#04030a" opacity="0.45"/>
+          </g>
+
+<!-- ═══ ГАРГУЛЬЯ: каменный хищник на абокусе. Светлее пилона, иначе тонет
+               в ночном небе; глаза горят — иначе читается как голова камня ═══ -->
+          <g id="gargoyleStone">
+            <!-- хвост, свисает через задний край плиты -->
+            <path d="M74,-26 C90,-20 95,-2 86,12 C79,23 66,25 61,16 C57,8 66,1 74,7"
+                  fill="none" stroke="url(#gargGrad)" stroke-width="10" stroke-linecap="butt"/>
+
+            <!-- туловище вытянутое, прижатое к плите -->
+            <path d="M-16,-42 C-10,-49 6,-51 22,-49 L58,-45 C72,-43 80,-35 80,-25
+                     C80,-16 76,-8 68,-6 L-8,-4 C-14,-4 -18,-7 -18,-13 Z"
+                  fill="url(#gargGrad)"/>
+
+            <!-- позвоночные гребни -->
+            <g fill="#0a0812" opacity="0.55">
+              <path d="M22,-50 l5,-9 l6,8 Z"/><path d="M34,-50 l5,-10 l6,9 Z"/>
+              <path d="M46,-50 l5,-9 l6,8 Z"/><path d="M58,-49 l5,-8 l5,7 Z"/>
+            </g>
+
+            <!-- сложенное крыло с рёбрами -->
+            <path d="M18,-47 L58,-45 C70,-43 76,-37 76,-29 L76,-15 L26,-19 Z" fill="url(#gargWing)"
+                  stroke="#0a0812" stroke-opacity="0.55" stroke-width="1.8" stroke-linejoin="round"/>
+            <g fill="none" stroke="#0a0812" stroke-opacity="0.6" stroke-width="2.6">
+              <path d="M26,-44 L70,-37"/><path d="M28,-36 L74,-27"/><path d="M30,-28 L76,-19"/>
+            </g>
+            <path d="M27,-45 L45,-30 L27,-16" fill="none" stroke="#0a0812"
+                  stroke-opacity="0.45" stroke-width="2.2"/>
+
+            <!-- задняя лапа -->
+            <path d="M56,-18 L74,-18 L74,-3 L58,-3 Z" fill="url(#gargWing)"/>
+
+            <!-- шея с загривком -->
+            <path d="M-14,-30 C-26,-34 -36,-30 -38,-20 L-38,-6 L-14,-10 Z" fill="url(#gargGrad)"/>
+            <g fill="#0a0812" opacity="0.5">
+              <path d="M-22,-32 l4,-8 l5,7 Z"/><path d="M-31,-30 l4,-8 l5,7 Z"/>
+            </g>
+
+            <!-- голова: клин, смотрит вниз-влево -->
+            <path d="M-15,-46 L-42,-44 L-57,-27 L-55,-11 L-40,-15 L-35,-29 L-17,-32 Z"
+                  fill="url(#gargGrad)"/>
+            <!-- тяжёлое надбровье, костяной наплыв -->
+            <path d="M-48,-33 L-24,-40 L-18,-31 L-45,-24 Z" fill="#0d0a18" opacity="0.7"/>
+            <path d="M-55,-26 C-62,-23 -65,-14 -58,-8 L-48,-12 L-46,-23 Z" fill="url(#gargWing)"/>
+
+            <!-- раскрытая пасть -->
+            <path d="M-55,-12 L-46,2 L-31,-8 L-36,-19 Z" fill="#05040a"/>
+            <!-- клыки: два крупных, два мелких -->
+            <path d="M-51,-8 l3,9 l3.4,-9.6 Z" fill="#e2dbf5" opacity="0.92"/>
+            <path d="M-42,-4 l2.4,7 l3,-7.4 Z" fill="#e2dbf5" opacity="0.8"/>
+            <path d="M-46,-18 l2.2,-5 l2.6,5.4 Z" fill="#e2dbf5" opacity="0.6"/>
+            <!-- огрызки зубов -->
+            <path d="M-39,-15 l1.8,4 l2.2,-4.2 Z" fill="#c9bfdd" opacity="0.5"/>
+
+            <!-- рога на загривке -->
+            <path d="M-14,-47 L-9,-63 L0,-48 Z" fill="url(#gargWing)"/>
+            <path d="M-2,-49 L3,-64 L11,-47 Z" fill="url(#gargWing)"/>
+
+            <!-- передние лапы, вцепившиеся в край плиты -->
+            <path d="M-14,-16 L16,-16 L18,-3 L-12,-3 Z" fill="url(#gargWing)"/>
+            <g fill="none" stroke="#e2dbf5" stroke-opacity="0.5" stroke-width="2.2" stroke-linecap="round">
+              <path d="M-9,-5 l-3,10"/><path d="M-2,-5 l-1,10"/>
+              <path d="M5,-5 l1,10"/><path d="M12,-5 l3,10"/>
+            </g>
+
+            <!-- глазницы: провалы с горящим внутри -->
+            <path d="M-44,-31 L-32,-35 L-30,-27 L-42,-23 Z" fill="#05040a"/>
+            <path d="M-29,-36 L-18,-39 L-16,-31 L-27,-28 Z" fill="#05040a"/>
+            <ellipse cx="-37" cy="-29" rx="3.2" ry="2.4" fill="#ff9c2e" opacity="0.95"/>
+            <ellipse cx="-22" cy="-33" rx="2.8" ry="2.2" fill="#ff9c2e" opacity="0.9"/>
+            <ellipse cx="-37" cy="-29" rx="1.2" ry="2" fill="#ffd9a0"/>
+            <ellipse cx="-22" cy="-33" rx="1" ry="1.8" fill="#ffd9a0"/>
+
+            <!-- лунный контур по хребту -->
+            <path d="M-16,-46 C-10,-53 6,-55 22,-53 L58,-50 C69,-49 76,-42 77,-33"
+                  fill="none" stroke="#cfc4f5" stroke-opacity="0.5" stroke-width="2.2"/>
+            <path d="M-15,-46 L-42,-44 L-57,-27" fill="none" stroke="#cfc4f5"
+                  stroke-opacity="0.36" stroke-width="1.8"/>
+          </g>
+        </defs>
+
+        <!-- ═══ пилоны ═══
+             зеркало относительно центра вьюбокса (x=400), а не 720:
+             translate(800,0) scale(-1,1) кладёт правый пилон вплотную к арке -->
+        <g class="pillar">
+          <use href="#pillarStone" x="0" y="0"/>
+          <use href="#pillarStone" transform="translate(800,0) scale(-1,1)"/>
+        </g>
+
+        <!-- ═══ гаргульи на капителях, зеркально ═══ -->
+        <g class="gargoyles">
+          <use href="#gargoyleStone" x="32" y="46"/>
+          <use href="#gargoyleStone" transform="translate(800,0) scale(-1,1)" x="32" y="46"/>
+        </g>
+
+        <!-- ═══ кованая арка ═══ -->
+        <g class="gate__iron">
+          <path d="M86,556 L86,214 C86,104 210,52 400,52 C590,52 714,104 714,214 L714,556"
+                fill="none" stroke="url(#ironGrad)" stroke-width="13" stroke-linecap="round"/>
+          <path d="M86,556 L86,214 C86,104 210,52 400,52 C590,52 714,104 714,214 L714,556"
+                fill="none" stroke="url(#ironHi)" stroke-width="3" stroke-linecap="round" opacity="0.75"/>
+
+          <!-- внутренняя арка -->
+          <path d="M128,556 L128,226 C128,138 232,96 400,96 C568,96 672,138 672,226 L672,556"
+                fill="none" stroke="url(#ironGrad)" stroke-width="7" opacity="0.85"/>
+          <path d="M170,556 L170,238 C170,166 252,134 400,134 C548,134 630,166 630,238 L630,556"
+                fill="none" stroke="url(#ironGrad)" stroke-width="4" opacity="0.6"/>
+
+          <!-- прутья -->
+          <g id="gate-bars"></g>
+
+          <!-- завитки -->
+          <g fill="none" stroke="url(#ironGrad)" stroke-width="5" opacity="0.95">
+            <path d="M400,206 c-26,0 -40,-18 -40,-36 c0,-20 20,-32 34,-22 c10,8 6,24 -6,26 c-8,2 -14,-6 -10,-14"/>
+            <path d="M400,206 c26,0 40,-18 40,-36 c0,-20 -20,-32 -34,-22 c-10,8 -6,24 6,26 c8,2 14,-6 10,-14"/>
+            <path d="M400,300 c-30,0 -46,-20 -46,-40 c0,-22 22,-36 38,-25 c11,8 7,26 -7,29 c-9,2 -16,-7 -11,-16"/>
+            <path d="M400,300 c30,0 46,-20 46,-40 c0,-22 -22,-36 -38,-25 c-11,8 -7,26 7,29 c9,2 16,-7 11,-16"/>
+          </g>
+
+          <!-- медальон с черепом -->
+          <g class="gate__medallion">
+            <circle cx="400" cy="452" r="34" fill="url(#ironPool)"/>
+            <circle cx="400" cy="452" r="27" fill="#0a0812" stroke="url(#ironGrad)" stroke-width="5"/>
+            <path d="M400,428 c11,0 19,8 19,18 c0,7 -4,12 -8,15 l0,7 l-6,0 l0,-5 l-10,0 l0,5 l-6,0 l0,-7 c-4,-3 -8,-8 -8,-15 c0,-10 8,-18 19,-18 Z" fill="#cfc6ea" opacity="0.78"/>
+            <circle cx="392" cy="446" r="4" fill="#0a0812"/>
+            <circle cx="408" cy="446" r="4" fill="#0a0812"/>
+            <path d="M395,458 h10 v6 h-10 Z" fill="#0a0812"/>
+            <circle cx="400" cy="452" r="42" fill="none" stroke="#6a5f92" stroke-opacity="0.4" stroke-width="2"/>
+          </g>
+
+          <!-- остриё-финиаль вверху -->
+          <g class="gate__finial">
+            <path d="M400,4 L382,34 L418,34 Z" fill="url(#ironGrad)"/>
+            <path d="M362,34 C348,34 340,44 344,54 C350,44 358,42 366,44 Z" fill="url(#ironGrad)"/>
+            <path d="M438,34 C452,34 460,44 456,54 C450,44 442,42 434,44 Z" fill="url(#ironGrad)"/>
+            <circle cx="400" cy="30" r="5" fill="#cfc6ea" opacity="0.5"/>
+          </g>
+        </g>
+      </svg>
+
+      <!-- фонари -->
+      <button class="lantern lantern--l" type="button" data-lantern aria-label="Фонарь — зажги">
+        <span class="lantern__chain"></span>
+        <span class="lantern__glow"></span>
+        <span class="lantern__body">
+          <span class="lantern__cap"></span>
+          <span class="lantern__glass"><span class="lantern__flame"></span></span>
+          <span class="lantern__foot"></span>
+        </span>
+      </button>
+
+      <button class="lantern lantern--r" type="button" data-lantern aria-label="Фонарь — зажги">
+        <span class="lantern__chain"></span>
+        <span class="lantern__glow"></span>
+        <span class="lantern__body">
+          <span class="lantern__cap"></span>
+          <span class="lantern__glass"><span class="lantern__flame"></span></span>
+          <span class="lantern__foot"></span>
+        </span>
+      </button>
+
+    </div>
+  </div>
+
+  <!-- передний план -->
+  <div class="layer layer--fore" data-depth="70">
+    <svg class="fore" id="fore-svg" viewBox="0 0 1440 300" preserveAspectRatio="none">
+      <g id="fore-ground"></g>
+      <g id="grass"></g>
+      <!-- кот рисуется после травы: раньше он оказывался под ней и выглядел
+           так, будто из него растёт трава -->
+      <g id="ground-cat-layer"></g>
+      <g id="fore-pumpkins"></g>
+    </svg>
+  </div>
+
+  <!-- паутина -->
+  <div class="web web--tl"></div>
+  <div class="web web--tr"></div>
+</div>
+
+<canvas class="fx-layer" id="fx-parts" aria-hidden="true"></canvas>
+
+<!-- ═══════════ ИНТРО ═══════════ -->
+<div class="intro-curtain" id="introCurtain" aria-hidden="true">
+  <span class="intro-curtain__rune">&#10022;</span>
+  <span class="intro-curtain__hint">нажми, чтобы не ждать</span>
+</div>
+
+<!-- ══════════ КОНТЕНТ ══════════ -->
+<main class="page page--center" id="hero">
+  <div class="hero">
+    <div class="hero__scrim" aria-hidden="true"></div>
+
+    <p class="eyebrow" data-reveal="0.05">31 октября · ночь тыкв</p>
+
+    <h1 class="hero__title display" data-reveal="0.14">
+      <span class="hero__word grad-text glow-ember">Хэллоуин</span>
+    </h1>
+
+    <div class="divider" data-reveal="0.22" aria-hidden="true">
+      <i>◆</i>
+    </div>
+
+    <p class="hero__lead" data-reveal="0.3">
+      Ворота открыты. За ними падает конфета, которой не бывает,
+      и лежит открытка, написанная при одной свече.
+      Решай, куда идти первым.
+    </p>
+
+    <div class="row hero__actions" data-reveal="0.4">
+      <a class="btn btn--primary" href="game.html">
+        <span>В Сахарный Поймач</span>
+      </a>
+      <a class="btn btn--ghost" href="card.html?edit=1">
+        <span>Собрать открытку</span>
+      </a>
+      <a class="btn btn--ghost" href="card.html">
+        <span>Открыть открытку</span>
+      </a>
+    </div>
+
+    <p class="hero__hint" data-reveal="0.5">
+      <span class="pumpkin-dot">✦</span>
+      Фонари и тыквы отзываются на прикосновение
+      <span class="pumpkin-dot">✦</span>
+    </p>
+  </div>
+</main>
+
+<div class="vignette" aria-hidden="true"></div>
+<div class="grain" aria-hidden="true"></div>
+
+<script src="assets/js/webgl-bg.js" defer></script>
+<script src="assets/js/particles.js" defer></script>
+<script src="assets/js/core.js" defer></script>
+<script src="assets/js/index.js" defer></script>
+</body>
+</html>
