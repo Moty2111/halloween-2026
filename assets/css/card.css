@@ -458,7 +458,7 @@ body.is-open .seal { pointer-events: none; }
   left: 50%;
   /* письмо должно быть заметно уже конверта, иначе в закрытом виде
      выглядывает по бокам; при закрытом rotateX сжимает только высоту */
-  width: min(520px, 86vw, 74vh);
+  width: min(520px, 93vw, 78vh);
   bottom: 5%;
   z-index: 1;
   transform: translateX(-50%) translateY(0) rotateX(56deg);

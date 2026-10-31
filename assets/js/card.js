@@ -478,11 +478,15 @@
       if (tr) {
         tr.textContent = '';
         /* деревья крупнее и их больше: раньше два тонких силуэта по краям
-           читались как случайные палки на фоне */
-        bareTree(tr, YARD.w * 0.075, YARD.hNear, 306, 3);
-        bareTree(tr, YARD.w * 0.905, YARD.hNear, 268, 5);
-        bareTree(tr, YARD.w * 0.245, YARD.hNear, 184, 7);
-        bareTree(tr, YARD.w * 0.742, YARD.hNear, 202, 11);
+           читались как случайные палки на фоне.
+           Важно: #yard-near-svg использует preserveAspectRatio="xMidYMax slice",
+           на узких экранах видимая зона viewBox сужается примерно до
+           x ∈ [0.18·W, 0.82·W] — крайние деревья обрезались и «висели».
+           Поэтому координаты держим внутри этой зоны. */
+        bareTree(tr, YARD.w * 0.20, YARD.hNear, 306, 3);
+        bareTree(tr, YARD.w * 0.80, YARD.hNear, 268, 5);
+        bareTree(tr, YARD.w * 0.42, YARD.hNear, 184, 7);
+        bareTree(tr, YARD.w * 0.62, YARD.hNear, 202, 11);
       }
 
       var gr = HW.$('#yard-graves');
@@ -596,7 +600,10 @@
          (≈1.33:1) — ниже, иначе крупное письмо наезжает на кнопки.
          В альбоме пол низкий — там высота кадра и так мала */
       var portrait = vh > global.innerWidth;
-      var floor = portrait ? Math.min(0.72, Math.max(0.34, (vh / global.innerWidth) * 0.4)) : 0.34;
+      /* телефонам (≈2.16:1) нужен высокий пол, но не максимальный — иначе
+         письмо вытягивается в узкую ленту-«чек» и не помещается на экран.
+         0.72 → 0.66: чуть компактнее, при этом текст остаётся читаемым */
+      var floor = portrait ? Math.min(0.66, Math.max(0.34, (vh / global.innerWidth) * 0.38)) : 0.34;
       if (s < floor) s = floor;
 
       var visH = s * curH;
