@@ -121,6 +121,7 @@
     var btnEdit = HW.$('#cd-edit');
     var btnSave = HW.$('#cd-save');
     var btnReset = HW.$('#cd-reset');
+    var btnClear = HW.$('#cd-clear');
     var btnShare = HW.$('#cd-share');
     var btnLink = HW.$('#cd-link');
 
@@ -301,6 +302,17 @@
         if (location.hash) history.replaceState(null, '', location.pathname);
         fillForm();
         flashNote('Вернули исходный текст.', true);
+      });
+    }
+
+    if (btnClear) {
+      btnClear.addEventListener('click', function () {
+        applyCard(DEFAULT_CARD);
+        HW.storage.del(CARD_KEY);
+        savedCard = { to: card.to, from: card.from, wish: card.wish };
+        if (location.hash) history.replaceState(null, '', location.pathname);
+        fillForm();
+        flashNote('Сохранение очищено. Письмо — исходное.', true);
       });
     }
 
